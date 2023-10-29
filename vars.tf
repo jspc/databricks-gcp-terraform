@@ -11,21 +11,19 @@ variable "region" {
 }
 
 variable "backend_rest_psce" {
-  description = ""
-  type        = string
-  default     = ""
+  type    = string
+  default = "databricks_rest"
 }
 
 variable "relay_psce" {
-  description = ""
-  type        = string
-  default     = ""
+  type    = string
+  default = "databricks_relay"
 }
 
 variable "databricks_account_id" {
   description = "Account ID for Databricks"
   type        = string
-  default     = "b0b424aa-a088-4285-86d1-163ee80bd2d1"
+  default     = ""
 }
 
 variable "databricks_google_service_account" {

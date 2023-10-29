@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+    tags:
+      - '*'
+
+jobs:
+  infra:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        create_credentials_file: 'true'
+        workload_identity_provider: 'projects/45102600112/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+        service_account: 'github-actions@techtest-403419.iam.gserviceaccount.com'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - uses: hashicorp/setup-terraform@v2
+
+    - run: terraform init
+
+    - id: plan
+      run: terraform plan -no-color -out plan
+      env:
+        TF_VAR_databricks_account_id: ${{ secrets.TF_VAR_DATABRICKS_ACCOUNT_ID }}
+        TF_VAR_databricks_google_service_account: ${{ secrets.TF_VAR_DATABRICKS_GOOGLE_SERVICE_ACCOUNT }}
+
+    - id: deploy
+      run: terraform apply -auto-approve ./plan
